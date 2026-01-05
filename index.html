@@ -424,6 +424,23 @@
         .difficulty-btn:hover:not(.active) {
             background: #e1ccae;
         }
+
+        /* Generic Victorian Button Style */
+        .victorian-btn {
+            background: #d2b48c;
+            color: #5e0000;
+            border: 2px solid #5e0000;
+            font-weight: 900;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.7rem;
+            padding: 4px 10px;
+        }
+        .victorian-btn:hover {
+            background: #5e0000;
+            color: #d2b48c;
+        }
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -431,7 +448,7 @@
     <div class="background-scene">
         <div class="coral-gate-bg"></div>
         <div class="light-string">
-            <div class="bulb"></div><div class="bulb"></div><div class="bulb ="></div><div class="bulb"></div>
+            <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
             <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
         </div>
         <div class="ground">
@@ -493,6 +510,7 @@
             <div class="streak-counter">STREAK: <span id="streak">0</span>/5</div>
             <p id="scope-hint" class="text-[10px] text-red-900 font-black italic mt-2 opacity-0">Right Click to Zoom</p>
             <p id="diff-label" class="text-[10px] text-stone-500 font-bold uppercase mt-1">Level: Easy</p>
+            <button onclick="backToMenu()" class="mt-4 victorian-btn">MAIN MENU</button>
         </div>
 
         <div id="booth-frame">
@@ -573,7 +591,8 @@
         function setDifficulty(level) {
             currentDifficulty = level;
             document.querySelectorAll('.difficulty-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`btn-${level}`).classList.add('active');
+            const btn = document.getElementById(`btn-${level}`);
+            if (btn) btn.classList.add('active');
             diffLabel.innerText = `Level: ${difficulties[level].label}`;
         }
 
@@ -621,9 +640,16 @@
         }
 
         function backToMenu() {
+            // Close scope if active
+            if (isScoped) toggleScope();
+            
             document.getElementById('game-over').style.display = 'none';
             container.style.display = 'none';
             introScreen.style.display = 'flex';
+            
+            // Clean up state
+            isGameOver = true; 
+            grid.innerHTML = '';
         }
 
         function setGun(type) {
@@ -742,8 +768,11 @@
                     if (score >= 60) endGame(true);
                 }
             } else {
-                streak = 0;
-                streakEl.innerText = streak;
+                // Clicking UI or background resets streak
+                if (target && target.id !== 'game-container') {
+                     streak = 0;
+                     streakEl.innerText = streak;
+                }
             }
         });
 
